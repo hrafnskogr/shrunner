@@ -1,5 +1,6 @@
 [package]
 name = "shrunner"
+authors = ["hrafnskogr <hrafnskogr@pm.me>"]
 version = "0.1.0"
 edition = "2021"
 
